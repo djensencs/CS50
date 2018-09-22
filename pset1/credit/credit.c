@@ -1,69 +1,60 @@
 //
-// a program that determines whether a provided credit card number is valid according to Luhn's algorithimm.
+// a program that determiens whether a number provided is a valid card # according to Luhn's algorithm
 //
-#include <stdio.h>
+
 #include <cs50.h>
+#include <stdio.h>
 
 int main(void)
-
 {
-    long long card, check;
-    int odd, even, type, count, i;
-    odd = even = count = 0;
-    i = 1;
+    long long card_num, last, slast;
+    int addprod, addsum, sum;
+    addprod = addsum = sum = 0;
 
+    // take input of positive card number
     do
     {
-        printf("CARD NUMBER: \n");
-        card = get_long_long();
+        card_num = get_long_long("CARD NUMBER: \n");
     }
-    while (card < 0);
+    while (card_num < 0);
 
-// counts the number of digits.
-    check = card;
-    while (check > 0)
+    // double every other digit and add the sum of product starting w/ 2nd to last digit
+    for (slast = card_num / 10; slast > 0; slast /= 100)
     {
-        check /= 10;
-        count++;
-    }
-    while (card > 0)
-    {
-// takes card number down to last digit.
-        int digit = card % 10;
-// when card is down to a double digit number will save value to determine card type later.
-        if (card < 100 && card > 9)
+        if (2 * (slast % 10) > 9)
         {
-            type = card;
-        }
-// integer i tracks odd or even state.
-        if (i % 2 == 1)
-        {
-            odd += digit;
+            // add the products digits
+            addprod += (2 * (slast % 10)) / 10;
+            addprod += (2 * (slast % 10)) % 10;
         }
         else
         {
-// multiplies the digit by 2 and then adds the sum of the products digits together.
-            digit *= 2;
-            even += digit / 10 + digit % 10;
+            // multiply by 2 and add sum
+            addprod += 2 * (slast % 10);
         }
-// removes a digit off the card.
-        card /= 10;
-        i++;
     }
-    int sum = even + odd;
+    // sum every other digit starting with the last
+    for (last = card_num; last > 0; last /= 100)
+    {
+        addsum += last % 10;
+    }
+
+    sum = addprod + addsum;
+
+    //  if # is valid check for card type
     if (sum % 10 == 0)
     {
-        if (((type / 10) == 4) && (count == 13 || count == 16))
-        {
-            printf("VISA\n");
-        }
-        else if (((type == 34) || (type == 37)) && (count = 15))
+        if ((card_num >= 340000000000000 && card_num < 350000000000000) || (card_num >= 370000000000000 && card_num < 380000000000000))
         {
             printf("AMEX\n");
         }
-        else if ((type > 50) && (type < 56) && (count = 16))
+        else if (card_num >= 5100000000000000 && card_num < 5600000000000000)
         {
             printf("MASTERCARD\n");
+        }
+        else if ((card_num >= 4000000000000 && card_num < 5000000000000) || (card_num >= 4000000000000000 && card_num < 5000000000000000))
+        {
+            printf("VISA\n");
         }
         else
         {
@@ -74,4 +65,5 @@ int main(void)
     {
         printf("INVALID\n");
     }
+    return 0;
 }
